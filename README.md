@@ -18,7 +18,7 @@ And finally the script downloads the additional script files that are then later
 
 Flash the base BeagleBone Debian 10.3 Console image linked above to an empty SD card. The SD card needs to be at least 1 GB for that image, but the later installation steps create a 2 GB swap file, so realistically it should be at least 8 GB for there to be a decent amount of free space as well.
 
-Insert the SD card to a BeagleBone Black, and then plug the BeagleBone to a PC with a USB cable. The BeagleBone should now boot, and it should create a USB network connection that you can use to log in via ssh to the BeagleBone, using address `192.168.7.2`. Note that the first boot using the fresh stock image may take something like 2-5 minutes to fully boot, before the ssh connection can be made.
+Insert the SD card to a BeagleBone Black, and then plug the BeagleBone to a PC with a USB cable. The BeagleBone should now boot, and it should create a USB network connection that you can use to log in via ssh to the BeagleBone, using address `192.168.7.2`. The first boot using the fresh stock image seems to take around 1.5 minutes to fully boot, before the ssh connection can be made.
 
 
 ### Usage

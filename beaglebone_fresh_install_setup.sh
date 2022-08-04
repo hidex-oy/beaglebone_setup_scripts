@@ -78,7 +78,6 @@ update_all_packages() {
 }
 
 setup_configs() {
-	# wget https://pastebin.com/raw/DudbPWHH -O .bashrc.new
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/home/debian/.bashrc -O /home/debian/.bashrc.new
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/etc/rc.local -O /etc/rc.local
 
@@ -88,6 +87,8 @@ setup_configs() {
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_2_fsck_resize.sh -O /usr/local/bin/beaglebone_boot_2_fsck_resize.sh
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_3_create_swap.sh -O /usr/local/bin/beaglebone_boot_3_create_swap.sh
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_disable_scripts.sh -O /usr/local/bin/beaglebone_boot_disable_scripts.sh
+
+	chmod 755 /etc/rc.local
 
 	cd /home/debian
 
@@ -107,17 +108,21 @@ setup_configs() {
 
 	uncomment_line "/boot/uEnv.txt" "uboot_overlay_addr4=/lib/firmware/BB-I2C2-RTC-DS1307.dtbo"
 
-	uncomment_line "/boot/uEnv.txt" "uboot_overlay_pru=/lib/firmware/AM335X-PRU-UIO-00A0.dtbo"
 	comment_line "/boot/uEnv.txt" "uboot_overlay_pru=/lib/firmware/AM335X-PRU-RPROC-4-19-TI-00A0.dtbo"
+	uncomment_line "/boot/uEnv.txt" "uboot_overlay_pru=/lib/firmware/AM335X-PRU-UIO-00A0.dtbo"
 
 	uncomment_line "/etc/default/bb-boot" "USB_IMAGE_FILE_DISABLED=yes"
+
+	# Disable the unnecessary login infos and MOTDs
 	comment_line "/etc/ssh/sshd_config" "Banner /etc/issue.net"
+	mv /etc/motd /etc/motd.orig
+	touch /etc/motd
 }
 
 setup_configs
-disable_useless_services
 update_all_packages
 download_and_install_hidex_kernel
+disable_useless_services
 
 #disable_mass_storage
 #disable_audio_video_overlays
@@ -125,8 +130,13 @@ download_and_install_hidex_kernel
 #enable_rtc_overlay
 
 # Remove the original kernel's modules
-rm -fr /lib/modules/4.19.*-ti-*
+rm -fr /lib/modules/4.*-ti-*
 
+echo ""
+echo "**************************"
+echo "******* Setup DONE *******"
+echo "**************************"
+echo ""
 echo "Please unplug the network cable and then reboot!"
 echo ""
 echo "After that, the base installation should be done."

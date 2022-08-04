@@ -1,7 +1,7 @@
 #!/bin/sh
 
 SWAP_FILE="/swapfile"
-SWAP_SIZE=2 # the size of the swap file, in megabytes
+SWAP_SIZE=2048 # the size of the swap file, in megabytes
 
 create_swap_file() {
 	if [ -f "${SWAP_FILE}" ]; then

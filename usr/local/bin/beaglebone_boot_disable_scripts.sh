@@ -6,7 +6,7 @@ comment_line() {
 
 	# If the line already exists, then comment it, if necessary
 	if grep -qF "${LINE}" ${FILENAME} ; then
-		echo "comment_line(): Commenting out line"
+		echo "comment_line(): Commenting out line ${LINE} in ${FILENAME}"
 		sed -i "\|^${LINE}|s|^|#|" ${FILENAME}
 	fi
 }

@@ -23,12 +23,17 @@ Insert the SD card to a BeagleBone Black, and then plug the BeagleBone to a PC w
 
 ### Usage
 
-To begin, plug the BeagleBone to a network cable, and log in via ssh (either via the USB network connection at `192.168.7.2` or the wired connection you just enabled by plugging it in, but you'd need to find out the IP for that network interface on your own). The username is `debian` and the default password is `temppwd`.
+To begin, log in via ssh via the USB network connection at `192.168.7.2`. The username is `debian` and the default password is `temppwd`.
 ```bash
 ssh debian@192.168.7.2
 ```
 
-Note that you probably want to unplug the network cable before any time the BeagleBone is rebooted, as it seems like the USB network connection doesn't come up if the network cable is plugged in. Of course you could then also just use that wired network connection to ssh in (if you know the IP) instead of the USB connection at `192.168.7.2`.
+Probably the very first thing you want to do is change the password from the default to something else:
+```bash
+passwd
+```
+
+Now before continuing, plug the BeagleBone to a network cable.
 
 First download the `beaglebone_fresh_install_setup.sh` script:
 
@@ -42,11 +47,14 @@ sudo bash beaglebone_fresh_install_setup.sh
 ```
 
 After that script is finished (assuming everything went ok), you should reboot once manually, so that the custom Hidex kernel is used (not that it matters for anything else yet, but the script deletes the modules for the default kernel):
+
+Note that you probably want to unplug the network cable now (and before any time the BeagleBone is rebooted), as it seems like the USB network connection doesn't come up if the network cable is plugged in. Of course you could then also just use that wired network connection to ssh in (if you know the IP) instead of the USB connection at `192.168.7.2`. If you want to use the wired connection, then you probably want to first log in once via the USB connection, so that you can use `ip addr` to find out the IP address for that network interface.
+
 ```bash
 sudo /sbin/reboot
 ```
 
-After that you basically want to install all the rest of the packages, such as the Hidex Control Platform version you want to use and any plugins and device config/script packages etc.
+After that reboot you basically want to install all the rest of the packages, such as the Hidex Control Platform version you want to use and any plugins and device config/script packages etc.
 
 Once everything is installed, enable the "staged boot setup scripts" by running the script `/usr/local/bin/beaglebone_enable_staged_boot_scripts.sh`:
 ```bash

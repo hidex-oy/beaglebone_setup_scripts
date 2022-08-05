@@ -7,7 +7,7 @@ uncomment_line() {
 	# If the line already exists, then uncomment it, if necessary
 	if grep -qF "${LINE}" ${FILENAME} ; then
 		echo "uncomment_line(): Uncommenting line ${LINE} in ${FILENAME}"
-		sed -i "\|^#\+\\s*${LINE}|s|^#\+\\s*||" ${FILENAME}
+		sed -i "\|^#\+\\s*${LINE}$|s|^#\+\\s*||" ${FILENAME}
 	else
 		# Add the line if it doesn't exist at all
 		echo "uncomment_line(): Adding line ${LINE} to ${FILENAME}"

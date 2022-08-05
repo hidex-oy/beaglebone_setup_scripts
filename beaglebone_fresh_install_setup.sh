@@ -14,7 +14,7 @@ uncomment_line() {
 	# If the line already exists, then uncomment it, if necessary
 	if grep -qF "${LINE}" ${FILENAME} ; then
 		echo "uncomment_line(): Uncommenting line ${LINE} in ${FILENAME}"
-		sed -i "\|^#\+\\s*${LINE}|s|^#\+\\s*||" ${FILENAME}
+		sed -i "\|^#\+\\s*${LINE}$|s|^#\+\\s*||" ${FILENAME}
 	else
 		# Add the line if it doesn't exist at all
 		echo "uncomment_line(): Adding line ${LINE} to ${FILENAME}"
@@ -51,6 +51,10 @@ enable_pru_overlay() {
 	uncomment_line "/boot/uEnv.txt" "uboot_overlay_pru=/lib/firmware/AM335X-PRU-UIO-00A0.dtbo"
 }
 
+disable_dnsmasq_logging() {
+	grep -qE "^log-facility=/dev/null" /etc/dnsmasq.conf || echo "log-facility=/dev/null" >> /etc/dnsmasq.conf
+}
+
 download_and_install_hidex_kernel() {
 	cd /home/debian
 	mkdir -p hidex_packages
@@ -62,6 +66,9 @@ download_and_install_hidex_kernel() {
 	apt-get install ./${IMG_NAME} ./${LIBC_NAME}
 
 	cd /home/debian
+
+	# Remove the original kernel's modules
+	rm -fr /lib/modules/4.*-ti-*
 }
 
 disable_useless_services() {
@@ -101,17 +108,12 @@ setup_configs() {
 	mkdir -p .ssh
 	chmod 700 .ssh
 
-	grep -qE "^log-facility=/dev/null" /etc/dnsmasq.conf || echo "log-facility=/dev/null" >> /etc/dnsmasq.conf
+	disable_audio_video_overlays
+	disable_mass_storage
+	enable_pru_overlay
+	enable_rtc_overlay
 
-	uncomment_line "/boot/uEnv.txt" "disable_uboot_overlay_audio=1"
-	uncomment_line "/boot/uEnv.txt" "disable_uboot_overlay_video=1"
-
-	uncomment_line "/boot/uEnv.txt" "uboot_overlay_addr4=/lib/firmware/BB-I2C2-RTC-DS1307.dtbo"
-
-	comment_line "/boot/uEnv.txt" "uboot_overlay_pru=/lib/firmware/AM335X-PRU-RPROC-4-19-TI-00A0.dtbo"
-	uncomment_line "/boot/uEnv.txt" "uboot_overlay_pru=/lib/firmware/AM335X-PRU-UIO-00A0.dtbo"
-
-	uncomment_line "/etc/default/bb-boot" "USB_IMAGE_FILE_DISABLED=yes"
+	disable_dnsmasq_logging
 
 	# Disable the unnecessary login infos and MOTDs
 	comment_line "/etc/ssh/sshd_config" "Banner /etc/issue.net"
@@ -120,17 +122,9 @@ setup_configs() {
 }
 
 setup_configs
-update_all_packages
-download_and_install_hidex_kernel
+#update_all_packages
+#download_and_install_hidex_kernel
 disable_useless_services
-
-#disable_mass_storage
-#disable_audio_video_overlays
-#enable_pru_overlay
-#enable_rtc_overlay
-
-# Remove the original kernel's modules
-rm -fr /lib/modules/4.*-ti-*
 
 echo ""
 echo "**************************"

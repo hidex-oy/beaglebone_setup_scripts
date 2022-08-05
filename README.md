@@ -33,10 +33,9 @@ Probably the very first thing you want to do is change the password from the def
 passwd
 ```
 
-Now before continuing, plug the BeagleBone to a network cable.
+Now before continuing, plug the BeagleBone to a network cable. You will also need to wait for the time to get synced from NTP, before wget is able to connect to any HTTPS addresses due to the certificates failing otherwise. You can check the current system time with `date`. It should only take like 20-30 seconds for the time to get synced after the wired network comes up.
 
 First download the `beaglebone_fresh_install_setup.sh` script:
-
 ```bash
 wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/beaglebone_fresh_install_setup.sh
 ```
@@ -47,21 +46,19 @@ sudo bash beaglebone_fresh_install_setup.sh
 ```
 
 After that script is finished (assuming everything went ok), you should reboot once manually, so that the custom Hidex kernel is used (not that it matters for anything else yet, but the script deletes the modules for the default kernel):
-
-Note that you probably want to unplug the network cable now (and before any time the BeagleBone is rebooted), as it seems like the USB network connection doesn't come up if the network cable is plugged in. Of course you could then also just use that wired network connection to ssh in (if you know the IP) instead of the USB connection at `192.168.7.2`. If you want to use the wired connection, then you probably want to first log in once via the USB connection, so that you can use `ip addr` to find out the IP address for that network interface.
-
 ```bash
 sudo /sbin/reboot
 ```
 
 After that reboot you basically want to install all the rest of the packages, such as the Hidex Control Platform version you want to use and any plugins and device config/script packages etc.
 
-Once everything is installed, enable the "staged boot setup scripts" by running the script `/usr/local/bin/beaglebone_enable_staged_boot_scripts.sh`:
+Once everything is installed, enable the "staged boot setup scripts" by running the script `/usr/local/bin/beaglebone_enable_staged_boot_scripts.sh`.
 ```bash
 sudo bash /usr/local/bin/beaglebone_enable_staged_boot_scripts.sh
 ```
+(This basically just uncomments the `/usr/local/bin/beaglebone_boot_staged_setup.sh` line in the `/etc/rc.local` file, so that the script will be run on each boot until it gets disabled again.)
 
-At this point **you don't want to reboot for any reason** until you have taken the final image of the installation, as the next reboot will start the cycle of:
+At this point **you don't want to reboot for any reason** until you have taken the final image of the installation, as the next reboot will start the file system expansion cycle:
 
 * on the first boot expand the root partition to cover the entire SD card
 * on the second boot run fsck and expanding the filesystem itself by running `resize2fs`

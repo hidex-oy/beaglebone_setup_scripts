@@ -4,7 +4,8 @@
 # https://beagleboard.org/latest-images
 # => https://debian.beagleboard.org/images/bone-debian-10.3-console-armhf-2020-04-06-1gb.img.xz
 
-IMG_NAME="linux-image-4.19.94hidex2+_4.19.94hidex2+-19_armhf.deb"
+KERNEL_IMG_NAME="linux-image-4.19.94hidex2+"
+KERNEL_IMG_FILENAME="linux-image-4.19.94hidex2+_4.19.94hidex2+-19_armhf.deb"
 LIBC_NAME="linux-libc-dev_4.19.94hidex2+-19_armhf.deb"
 
 uncomment_line() {
@@ -60,15 +61,20 @@ download_and_install_hidex_kernel() {
 	mkdir -p hidex_packages
 	cd hidex_packages
 
-	test -f "${IMG_NAME}" || wget https://github.com/hidex-oy/linux/releases/download/2/${IMG_NAME}
+	test -f "${KERNEL_IMG_FILENAME}" || wget https://github.com/hidex-oy/linux/releases/download/2/${KERNEL_IMG_FILENAME}
 	test -f "${LIBC_NAME}" || wget https://github.com/hidex-oy/linux/releases/download/2/${LIBC_NAME}
 
-	apt-get install ./${IMG_NAME} ./${LIBC_NAME}
+	#apt-get install ./${KERNEL_IMG_FILENAME} ./${LIBC_NAME}
+	dpkg -i ./${LIBC_NAME}
+	dpkg -i ./${KERNEL_IMG_FILENAME}
+	#dpkg-reconfigure ${KERNEL_IMG_NAME}
 
 	cd /home/debian
 
 	# Remove the original kernel's modules
 	rm -fr /lib/modules/4.*-ti-*
+
+	apt-get clean
 }
 
 disable_useless_services() {
@@ -122,8 +128,8 @@ setup_configs() {
 }
 
 setup_configs
-#update_all_packages
-#download_and_install_hidex_kernel
+update_all_packages
+download_and_install_hidex_kernel
 disable_useless_services
 
 echo ""

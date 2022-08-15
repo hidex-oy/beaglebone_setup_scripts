@@ -4,21 +4,45 @@ This repository contains the scripts to create the full installation images (or 
 
 The image that was used for testing is the Console image based on Debian 10.3 here: https://debian.beagleboard.org/images/bone-debian-10.3-console-armhf-2020-04-06-1gb.img.xz
 
+
 ## Creating the base "Hidex image" from an upstream image
 
 The script `beaglebone_fresh_install_setup.sh` is used to create the base installation based on a fresh upstream BeagleBone Debian image.
 
 This base installation contains the custom Hidex Linux kernel, which patches the USB device handling to work around issues in some older devices (wrongly set HID poll interval value).
 
-It also modifies a few config files, to disable the "tutorial drive" feature, and to use the correct PRU Device Tree Overlay, and also to enable the external DS1307 RTC using another overlay. Additionally it disables the audio and video related overlays, and it redirects dnsmasq log output to `/dev/null`.
+It also modifies a few config files and downloads a number of scripts and installs a few needed packages.
 
-And finally the script downloads the additional script files that are then later used during the first boots of the final finished image, to automatically expand the partition to fill the SD card, and to enable a swap file.
+The config changes include:
+* Disable the "tutorial drive" feature and disable the unnecessary/spammy login messages
+* Download a new `.bashrc` file with some useful aliases and "nicer prompt color"
+* Use the correct PRU Device Tree Overlay (PRU-UIO vs. PRU-RPROC)
+* Enable the external DS1307 RTC using another overlay
+* Disables the audio and video related overlays, as the HDMI lines are needed for the custom cape in some device versions
+* Redirect dnsmasq log output to `/dev/null`
+* Setup an `/etc/rc.local` file to disable the bright blue LEDs from the board on every boot, to prevent blue light leakage to the detectors
+
+The script also downloads the additional scripts that are used later on, during the first couple of boots of the final finished image, to automatically expand the partition to fill the SD card, and to enable a swap file.
+
 
 ### Prerequisites
 
 Flash the base BeagleBone Debian 10.3 Console image linked above to an empty SD card. The SD card needs to be at least 1 GB for that image, but the later installation steps create a 2 GB swap file, so realistically it should be at least 8 GB for there to be a decent amount of free space as well.
 
-Insert the SD card to a BeagleBone Black, and then plug the BeagleBone to a PC with a USB cable. The BeagleBone should now boot, and it should create a USB network connection that you can use to log in via ssh to the BeagleBone, using address `192.168.7.2`. The first boot using the fresh stock image seems to take around 1.5 minutes to fully boot, before the ssh connection can be made.
+Make sure the SD card doesn't contain anything you care about, as it will get overwritten by the following command!
+
+On Linux the image can be written to the card with the following command, assuming that the SD card is `/dev/mmcblk0`. **BE SURE TO CHECK THE DEVICE OR YOU CAN OVERWRITE YOUR DATA!!!**
+Also unmount the card first, if it got automatically mounted when you inserted it.
+```bash
+# Check your block devices, and  make sure you use the correect device node that corresponds to the SD card.
+lsblk
+# Write the image to the card
+xzcat bone-debian-10.3-console-armhf-2020-04-06-1gb.img.xz > /dev/mmcblk0
+# Flush the buffers before removing the card
+sync
+```
+
+Insert the SD card to a BeagleBone Black, and then plug the BeagleBone to a PC with a USB cable. The BeagleBone should now boot, and it should create a USB network connection that you can use to log in via ssh to the BeagleBone. The default IP address is `192.168.7.2`. The first boot using the fresh stock image seems to take around 1.5 minutes to fully boot, before the ssh connection can be made.
 
 
 ### Usage
@@ -33,7 +57,9 @@ Probably the very first thing you want to do is change the password from the def
 passwd
 ```
 
-Now before continuing, plug the BeagleBone to a network cable. You will also need to wait for the time to get synced from NTP, before wget is able to connect to any HTTPS addresses due to the certificates failing otherwise. You can check the current system time with `date`. It should only take like 20-30 seconds for the time to get synced after the wired network comes up.
+Now before continuing, plug the BeagleBone to a network cable. You will also need to wait for the time to get synced from NTP, before wget is able to connect to any HTTPS addresses due to the certificates failing otherwise.
+
+You can check the current system time with `date`. It should only take something like 20-30 seconds for the time to get synced after the wired network comes up.
 
 First download the `beaglebone_fresh_install_setup.sh` script:
 ```bash
@@ -45,7 +71,7 @@ Then run that script as root (with sudo):
 sudo bash beaglebone_fresh_install_setup.sh
 ```
 
-After that script is finished (assuming everything went ok), you should reboot once manually, so that the custom Hidex kernel is used (not that it matters for anything else yet, but the script deletes the modules for the default kernel):
+After that script is finished (assuming everything went ok), you should reboot once manually, so that the custom Hidex kernel is used (not that it matters much for anything else yet, but the script deletes the old kernel including the kernel modules):
 ```bash
 sudo /sbin/reboot
 ```
@@ -96,7 +122,7 @@ Device         Boot Start     End Sectors  Size Id Type
 /dev/mmcblk0p1 *     8192 1843199 1835008  896M 83 Linux
 ```
 
-Here the End sector is `1843199`, thus there are 1843200 sectors of data until the end of that partition.
+Here the End sector is `1843199`, thus there are 1843200 sectors of data (starting from 0) until the end of that partition.
 So the command to read a disk image from the card, and compress it on the fly, would be:
 
 ```bash

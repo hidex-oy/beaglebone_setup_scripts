@@ -74,8 +74,9 @@ Now unplug the BeagleBone from the PC and take out the SD card, and take a disk 
 
 If you use Win32 Disk Imager to take the image, then enable the option `Read Only Allocated Partitions`. Next you also probably want to compress that image using 7-zip and the `xz` Archive format. At least the Balena Etcher image flasher can directly read that compressed image, and this way the image takes as little space as feasible.
 
-On Linux you can take a disk image with the `dd` utility. For that you want to check the partition table o nthe card, and only read from the start of the card to the end of the first and only partition on the card.
-**Note that you need to check what device the card appears as in your case!!** Here it is `/dev/mmcblk0`.
+On Linux you can take a disk image with the `dd` utility. For that you want to check the partition table on the card, and only read from the start of the card to the end of the first and only partition on the card.
+**Note that you need to check what device the card appears as in your case (with `lsblk` and/or `df -h` and/or `dmesg | less`)!!**
+Here it is `/dev/mmcblk0`:
 
 ```bash
 fdisk -l /dev/mmcblk0

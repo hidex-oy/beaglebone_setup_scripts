@@ -57,6 +57,8 @@ disable_dnsmasq_logging() {
 }
 
 disable_login_msgs() {
+	echo "*** Disable login messages"
+
 	# Disable the unnecessary login infos and MOTDs
 	comment_line "/etc/ssh/sshd_config" "Banner /etc/issue.net"
 
@@ -66,6 +68,8 @@ disable_login_msgs() {
 }
 
 download_and_install_hidex_kernel() {
+	echo "*** Download and install Hidex kernel"
+
 	cd /home/debian
 	mkdir -p hidex_packages
 	cd hidex_packages
@@ -87,7 +91,19 @@ download_and_install_hidex_kernel() {
 	apt-get clean
 }
 
+install_required_packages() {
+	echo "*** Install required packages"
+
+	apt-get install -y i2c-tools
+
+	# cd /home/debian/hidex-packages
+	# The setup_configs() function should download this
+	# dpkg -i ./linux-firmware-hidex-beaglebone-1.0.0.deb
+}
+
 disable_useless_services() {
+	echo "*** Disable useless services"
+
 	systemctl disable bluetooth.service
 	systemctl disable cron.service
 	systemctl disable rsync.service
@@ -95,16 +111,18 @@ disable_useless_services() {
 }
 
 update_all_packages() {
+	echo "*** Update all packages"
+
 	apt-get update
 	apt-get upgrade -y
 	apt-get clean
 }
 
-setup_configs() {
+download_files() {
+	echo "*** Download files"
+
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/home/debian/.bashrc -O /home/debian/.bashrc.new
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/etc/rc.local -O /etc/rc.local
-
-	chmod 755 /etc/rc.local
 
 	cd /usr/local/bin
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_enable_staged_boot_scripts.sh
@@ -119,10 +137,21 @@ setup_configs() {
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_black_power_led_off.sh
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_black_power_led_on.sh
 
-	chmod +x /usr/local/bin/*
+	# cd /home/debian/hidex-packages
+	# wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/deb/linux-firmware-hidex-beaglebone-1.0.0.deb
+
+	mkdir -p /lib/firmware/mediatek
+	wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mediatek/mt7610u.bin -O /lib/firmware/mediatek/mt7610u.bin
 
 	cd /home/debian
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/wlan_howto.md
+}
+
+setup_configs() {
+	echo "*** Setup configs"
+
+	chmod 755 /etc/rc.local
+	chmod +x /usr/local/bin/*
 
 	if [ -f .bashrc.new ]; then
 		mv .bashrc .bashrc.orig
@@ -142,9 +171,11 @@ setup_configs() {
 	disable_login_msgs
 }
 
+download_files
 setup_configs
 update_all_packages
 download_and_install_hidex_kernel
+install_required_packages
 disable_useless_services
 
 echo ""

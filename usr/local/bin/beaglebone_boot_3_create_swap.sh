@@ -11,7 +11,7 @@ create_swap_file() {
 
 	echo "Creating the swap file"
 	dd if=/dev/zero of=${SWAP_FILE} bs=1M count=${SWAP_SIZE}
-	chmod 600 ${SWAP_SIZE}
+	chmod 600 ${SWAP_FILE}
 	mkswap -f ${SWAP_FILE}
 }
 
@@ -26,6 +26,8 @@ enable_swap_file() {
 
 	# Add the new swap line
 	echo "${SWAP_FILE}	swap	swap	defaults	0	0" >> /etc/fstab
+
+	swapon ${SWAP_FILE}
 }
 
 echo "@ beaglebone_boot_3_create_swap.sh"

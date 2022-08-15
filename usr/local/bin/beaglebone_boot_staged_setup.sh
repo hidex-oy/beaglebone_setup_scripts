@@ -14,6 +14,8 @@ run_and_remove_script() {
 
 echo "@ beaglebone_boot_staged_setup.sh"
 
+sleep 20
+
 run_and_remove_script "/usr/local/bin/beaglebone_boot_1_grow_partition.sh" && reboot && exit 0
 run_and_remove_script "/usr/local/bin/beaglebone_boot_2_fsck_resize.sh" && reboot && exit 0
 run_and_remove_script "/usr/local/bin/beaglebone_boot_3_create_swap.sh"

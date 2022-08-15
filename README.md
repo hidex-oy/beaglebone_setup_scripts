@@ -14,7 +14,7 @@ It also modifies a few config files, to disable the "tutorial drive" feature, an
 
 And finally the script downloads the additional script files that are then later used during the first boots of the final finished image, to automatically expand the partition to fill the SD card, and to enable a swap file.
 
-### Prerequisite
+### Prerequisites
 
 Flash the base BeagleBone Debian 10.3 Console image linked above to an empty SD card. The SD card needs to be at least 1 GB for that image, but the later installation steps create a 2 GB swap file, so realistically it should be at least 8 GB for there to be a decent amount of free space as well.
 
@@ -73,3 +73,31 @@ sudo /sbin/shutdown -h now
 Now unplug the BeagleBone from the PC and take out the SD card, and take a disk image.
 
 If you use Win32 Disk Imager to take the image, then enable the option `Read Only Allocated Partitions`. Next you also probably want to compress that image using 7-zip and the `xz` Archive format. At least the Balena Etcher image flasher can directly read that compressed image, and this way the image takes as little space as feasible.
+
+On Linux you can take a disk image with the `dd` utility. For that you want to check the partition table o nthe card, and only read from the start of the card to the end of the first and only partition on the card.
+**Note that you need to check what device the card appears as in your case!!** Here it is `/dev/mmcblk0`.
+
+```bash
+fdisk -l /dev/mmcblk0
+```
+
+Example output:
+```
+debian@beaglebone ~ $  sudo fdisk -l /dev/mmcblk0
+Disk /dev/mmcblk0: 29.7 GiB, 31914983424 bytes, 62333952 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0x411292eb
+
+Device         Boot Start     End Sectors  Size Id Type
+/dev/mmcblk0p1 *     8192 1843199 1835008  896M 83 Linux
+```
+
+Here the End sector is `1843199`, thus there are 1843200 sectors of data until the end of that partition.
+So the command to read a disk image from the card, and compress it on the fly, would be:
+
+```bash
+dd if=/dev/mmcblk0 bs=512 count=1843200 | lzma -9 > bbb_image.img.xz
+```

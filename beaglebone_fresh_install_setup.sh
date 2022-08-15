@@ -4,8 +4,8 @@
 # https://beagleboard.org/latest-images
 # => https://debian.beagleboard.org/images/bone-debian-10.3-console-armhf-2020-04-06-1gb.img.xz
 
-KERNEL_IMG_NAME="linux-image-4.19.94hidex2+"
-KERNEL_IMG_FILENAME="linux-image-4.19.94hidex2+_4.19.94hidex2+-19_armhf.deb"
+KERNEL_VERSION=4.19.94-ti-r73-hidex.10
+KERNEL_IMG_FILENAME="linux-image-hidex-${KERNEL_VERSION}_armhf.deb"
 LIBC_NAME="linux-libc-dev_4.19.94hidex2+-19_armhf.deb"
 
 uncomment_line() {
@@ -56,24 +56,34 @@ disable_dnsmasq_logging() {
 	grep -qE "^log-facility=/dev/null" /etc/dnsmasq.conf || echo "log-facility=/dev/null" >> /etc/dnsmasq.conf
 }
 
+disable_login_msgs() {
+	# Disable the unnecessary login infos and MOTDs
+	comment_line "/etc/ssh/sshd_config" "Banner /etc/issue.net"
+
+	if [ ! -f /etc/motd.orig ]; then
+		mv /etc/motd /etc/motd.orig && touch /etc/motd
+	fi
+}
+
 download_and_install_hidex_kernel() {
 	cd /home/debian
 	mkdir -p hidex_packages
 	cd hidex_packages
 
-	test -f "${KERNEL_IMG_FILENAME}" || wget https://github.com/hidex-oy/linux/releases/download/2/${KERNEL_IMG_FILENAME}
-	test -f "${LIBC_NAME}" || wget https://github.com/hidex-oy/linux/releases/download/2/${LIBC_NAME}
+	# test -f "${LIBC_NAME}" || wget https://github.com/hidex-oy/linux/releases/download/2/${LIBC_NAME}
+	test -f "${LIBC_NAME}" && dpkg -i ./${LIBC_NAME}
 
-	#apt-get install ./${KERNEL_IMG_FILENAME} ./${LIBC_NAME}
-	dpkg -i ./${LIBC_NAME}
+	test -f "${KERNEL_IMG_FILENAME}" || wget https://github.com/hidex-oy/linux/releases/download/${KERNEL_VERSION}/${KERNEL_IMG_FILENAME}
 	dpkg -i ./${KERNEL_IMG_FILENAME}
+
 	#dpkg-reconfigure ${KERNEL_IMG_NAME}
 
 	cd /home/debian
 
-	# Remove the original kernel's modules
-	rm -fr /lib/modules/4.*-ti-*
+	# Update the boot loader file to point to the new kernel
+	sed -i "\|^uname_r=|s|^uname_r=.*\?$|uname_r=${KERNEL_VERSION}+|" /boot/uEnv.txt
 
+	apt-get remove -y linux-image-4.19.94-ti-r42
 	apt-get clean
 }
 
@@ -94,16 +104,20 @@ setup_configs() {
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/home/debian/.bashrc -O /home/debian/.bashrc.new
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/etc/rc.local -O /etc/rc.local
 
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_enable_staged_boot_scripts.sh -O /usr/local/bin/beaglebone_enable_staged_boot_scripts.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_staged_setup.sh -O /usr/local/bin/beaglebone_boot_staged_setup.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_1_grow_partition.sh -O /usr/local/bin/beaglebone_boot_1_grow_partition.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_2_fsck_resize.sh -O /usr/local/bin/beaglebone_boot_2_fsck_resize.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_3_create_swap.sh -O /usr/local/bin/beaglebone_boot_3_create_swap.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_disable_scripts.sh -O /usr/local/bin/beaglebone_boot_disable_scripts.sh
-
 	chmod 755 /etc/rc.local
 
+	cd /usr/local/bin
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_enable_staged_boot_scripts.sh
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_staged_setup.sh
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_1_grow_partition.sh
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_2_fsck_resize.sh
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_3_create_swap.sh
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_disable_scripts.sh
+
+	chmod +x /usr/local/bin/beaglebone_boot_*.sh
+
 	cd /home/debian
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/wlan_howto.md
 
 	if [ -f .bashrc.new ]; then
 		mv .bashrc .bashrc.orig
@@ -120,11 +134,7 @@ setup_configs() {
 	enable_rtc_overlay
 
 	disable_dnsmasq_logging
-
-	# Disable the unnecessary login infos and MOTDs
-	comment_line "/etc/ssh/sshd_config" "Banner /etc/issue.net"
-	mv /etc/motd /etc/motd.orig
-	touch /etc/motd
+	disable_login_msgs
 }
 
 setup_configs
@@ -137,11 +147,11 @@ echo "**************************"
 echo "******* Setup DONE *******"
 echo "**************************"
 echo ""
-echo "Please unplug the network cable and then reboot!"
+echo "Please reboot now!"
 echo ""
-echo "After that, the base installation should be done."
+echo "After that, the installation and update of the base system is be done."
 echo ""
-echo "Then you should install all the necessary packages (Hidex Control Platform etc.)"
+echo "Next you should install all the necessary packages (Hidex Control Platform etc.)"
 echo "that you want in the final image, and once those are all installed,"
 echo "then run the script /usr/local/bin/beaglebone_enable_staged_boot_scripts.sh"
 echo ""

@@ -11,7 +11,7 @@ comment_line() {
 	fi
 }
 
-echo "@ beaglebone_boot_4_disable_boot_setup_scripts.sh"
+echo "@ beaglebone_boot_disable_scripts.sh"
 
 comment_line "/etc/rc.local" "/usr/local/bin/beaglebone_boot_staged_setup.sh"
 

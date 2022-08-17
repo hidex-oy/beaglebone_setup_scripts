@@ -29,15 +29,19 @@ The script also downloads the additional scripts that are used later on, during 
 
 Flash the base BeagleBone Debian 10.3 Console image linked above to an empty SD card. The SD card needs to be at least 1 GB for that image, but the later installation steps create a 2 GB swap file, so realistically it should be at least 8 GB for there to be a decent amount of free space as well.
 
-Make sure the SD card doesn't contain anything you care about, as it will get overwritten by the following command!
+**Note:** Make sure the SD card doesn't contain anything you care about, as it will get overwritten by the following command!
 
-On Linux the image can be written to the card with the following command, assuming that the SD card is `/dev/mmcblk0`. **BE SURE TO CHECK THE DEVICE OR YOU CAN OVERWRITE YOUR DATA!!!**
-Also unmount the card first, if it got automatically mounted when you inserted it.
+On Linux the image can be written to the card with the following command, assuming that the SD card is `/dev/mmcblk0`. Unmount the card first, if it got automatically mounted when you inserted it.
+
+**BE SURE TO CHECK THE DEVICE OR YOU CAN OVERWRITE YOUR DATA!!!**
 ```bash
-# Check your block devices, and  make sure you use the correect device node that corresponds to the SD card.
+# Check your block devices, and  make sure you use the correct
+# device node that corresponds to the SD card.
 lsblk
+
 # Write the image to the card
 xzcat bone-debian-10.3-console-armhf-2020-04-06-1gb.img.xz > /dev/mmcblk0
+
 # Flush the buffers before removing the card
 sync
 ```
@@ -105,7 +109,7 @@ On Linux you can take a disk image with the `dd` utility. For that you want to c
 Here it is `/dev/mmcblk0`:
 
 ```bash
-fdisk -l /dev/mmcblk0
+sudo fdisk -l /dev/mmcblk0
 ```
 
 Example output:
@@ -126,5 +130,5 @@ Here the End sector is `1843199`, thus there are 1843200 sectors of data (starti
 So the command to read a disk image from the card, and compress it on the fly, would be:
 
 ```bash
-dd if=/dev/mmcblk0 bs=512 count=1843200 | lzma -9 > bbb_image.img.xz
+sudo dd if=/dev/mmcblk0 bs=512 count=1843200 | lzma -9 > bbb_image.img.xz
 ```

@@ -88,7 +88,6 @@ download_and_install_hidex_kernel() {
 	sed -i "\|^uname_r=|s|^uname_r=.*\?$|uname_r=${KERNEL_VERSION}+|" /boot/uEnv.txt
 
 	apt-get remove -y linux-image-4.19.94-ti-r42
-	apt-get clean
 }
 
 install_required_packages() {
@@ -115,7 +114,6 @@ update_all_packages() {
 
 	apt-get update
 	apt-get upgrade -y
-	apt-get clean
 }
 
 download_files() {
@@ -177,6 +175,9 @@ update_all_packages
 download_and_install_hidex_kernel
 install_required_packages
 disable_useless_services
+
+chown -R debian:debian /home/debian
+apt-get clean
 
 echo ""
 echo "**************************"

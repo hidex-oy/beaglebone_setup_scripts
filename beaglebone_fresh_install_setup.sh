@@ -140,7 +140,9 @@ download_files() {
 	# wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/deb/linux-firmware-hidex-beaglebone-1.0.0.deb
 
 	mkdir -p /lib/firmware/mediatek
-	wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mediatek/mt7610u.bin -O /lib/firmware/mediatek/mt7610u.bin
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/lib/firmware/mediatek/mt7610u.bin -O /lib/firmware/mediatek/mt7610u.bin
+	# The official repo for some reason gives a 0 byte file when this script is run. But manually fetching it with wget later on works... /shrug
+	#wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mediatek/mt7610u.bin -O /lib/firmware/mediatek/mt7610u.bin
 
 	cd /lib/firmware
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/dtbo/HIDEX-LEDCAPE-C2-00C2.dtbo

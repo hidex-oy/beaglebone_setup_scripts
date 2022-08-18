@@ -6,7 +6,9 @@ This chip is found on the ASUS USB AC-51 WiFi dongle.
 - Plug in the WLAN USB Dongle.
 - Check with `ip addr` or `/sbin/ifconfig` that you got the `wlan0` interface
 - List the available WiFi networks with `/sbin/iwlist wlan0 scan | grep ESSID`
-- (If not done once already for the current network:) Run `wpa_passphrase "your network ESSID" "network passphrase" > wpa_supplicant.conf` to write the network info to the `wpa_supplicant.conf` config file.
+- (If not done once already for the current network:)
+  Run `wpa_passphrase "your network ESSID" "network passphrase" > wpa_supplicant.conf`
+  to write the network info to the `wpa_supplicant.conf` config file.
 
 The next steps need to be done as root:
 - Connect to the access point with `wpa_supplicant -B -c wpa_supplicant.conf -i wlan0`

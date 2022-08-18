@@ -134,6 +134,7 @@ download_files() {
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_black_user_leds_on.sh
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_black_power_led_off.sh
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_black_power_led_on.sh
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/eeprom_write.sh
 
 	# cd /home/debian/hidex-packages
 	# wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/deb/linux-firmware-hidex-beaglebone-1.0.0.deb
@@ -146,6 +147,12 @@ download_files() {
 
 	cd /home/debian
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/wlan_howto.md
+
+	mkdir -p eeprom
+	cd eeprom
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/eeprom/eeprom_hidex_ledcape_c2_4.bin
+
+	cd /home/debian
 }
 
 setup_configs() {

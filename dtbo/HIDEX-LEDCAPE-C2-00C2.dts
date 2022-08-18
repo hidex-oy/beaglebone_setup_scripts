@@ -32,6 +32,12 @@
     fragment@1 {
         target = <&ocp>;
         __overlay__ {
+            /*
+             * Free up the pins used by the cape from the pinmux helpers.
+             */
+            P9_28_pinmux { status = "disabled"; };  /* P9_28: pr1_pru0_pru_r31_3 */
+            P9_30_pinmux { status = "disabled"; };  /* P9_30: pr1_pru0_pru_r30_2 */
+
             bs_pinmode_P9_28_0x6_pinmux {
                 compatible = "bone-pinmux-helper";
                 status = "okay";

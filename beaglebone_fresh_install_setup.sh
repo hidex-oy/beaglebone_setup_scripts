@@ -93,6 +93,7 @@ download_and_install_hidex_kernel() {
 install_required_packages() {
 	echo "*** Install required packages"
 
+	apt-get install -y locales
 	apt-get install -y i2c-tools
 
 	# cd /home/debian/hidex-packages
@@ -109,10 +110,15 @@ disable_useless_services() {
 	systemctl disable wpa_supplicant.service
 }
 
+update_package_repo() {
+	echo "*** Update package repo"
+
+	apt-get update
+}
+
 update_all_packages() {
 	echo "*** Update all packages"
 
-	apt-get update
 	apt-get upgrade -y
 }
 
@@ -121,6 +127,7 @@ download_files() {
 
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/home/debian/.bashrc -O /home/debian/.bashrc.new
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/etc/rc.local -O /etc/rc.local
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/etc/locale.gen -O /etc/locale.gen
 
 	cd /usr/local/bin
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_enable_staged_boot_scripts.sh
@@ -163,6 +170,8 @@ setup_configs() {
 	chmod 755 /etc/rc.local
 	chmod +x /usr/local/bin/*
 
+	cd /home/debian
+
 	if [ -f .bashrc.new ]; then
 		mv .bashrc .bashrc.orig
 		mv .bashrc.new .bashrc
@@ -182,10 +191,11 @@ setup_configs() {
 }
 
 download_files
+update_package_repo
+install_required_packages
 setup_configs
 update_all_packages
 download_and_install_hidex_kernel
-install_required_packages
 disable_useless_services
 
 chown -R debian:debian /home/debian

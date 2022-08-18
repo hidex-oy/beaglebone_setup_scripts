@@ -141,6 +141,9 @@ download_files() {
 	mkdir -p /lib/firmware/mediatek
 	wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mediatek/mt7610u.bin -O /lib/firmware/mediatek/mt7610u.bin
 
+	cd /lib/firmware
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/dtbo/HIDEX-LEDCAPE-C2-00C2.dtbo
+
 	cd /home/debian
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/wlan_howto.md
 }

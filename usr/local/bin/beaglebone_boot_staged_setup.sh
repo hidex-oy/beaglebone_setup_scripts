@@ -25,4 +25,13 @@ run_and_remove_script "/usr/local/bin/beaglebone_boot_3_create_swap.sh"
 
 run_and_remove_script "/usr/local/bin/beaglebone_boot_disable_scripts.sh"
 
+# Set up a LED bar animation thing to indicate finished setup
+echo timer > /sys/class/leds/beaglebone\:green\:usr0/trigger
+sleep 0.1
+echo timer > /sys/class/leds/beaglebone\:green\:usr1/trigger
+sleep 0.1
+echo timer > /sys/class/leds/beaglebone\:green\:usr2/trigger
+sleep 0.1
+echo timer > /sys/class/leds/beaglebone\:green\:usr3/trigger
+
 exit 0

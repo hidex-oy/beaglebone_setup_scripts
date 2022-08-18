@@ -11,9 +11,9 @@
 #
 # By default this script does nothing.
 
-#/usr/local/bin/beaglebone_boot_staged_setup.sh
-
 /usr/local/bin/beaglebone_black_user_leds_off.sh
 /usr/local/bin/beaglebone_black_power_led_off.sh
+
+#/usr/local/bin/beaglebone_boot_staged_setup.sh
 
 exit 0

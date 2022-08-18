@@ -80,8 +80,6 @@ download_and_install_hidex_kernel() {
 	test -f "${KERNEL_IMG_FILENAME}" || wget https://github.com/hidex-oy/linux/releases/download/${KERNEL_VERSION}/${KERNEL_IMG_FILENAME}
 	dpkg -i ./${KERNEL_IMG_FILENAME}
 
-	#dpkg-reconfigure ${KERNEL_IMG_NAME}
-
 	cd /home/debian
 
 	# Update the boot loader file to point to the new kernel
@@ -93,12 +91,22 @@ download_and_install_hidex_kernel() {
 install_required_packages() {
 	echo "*** Install required packages"
 
-	apt-get install -y locales
-	apt-get install -y i2c-tools
+	apt-get install -y locales i2c-tools unzip zip libicu63 libhidapi-libusb0 libhidapi-dev
 
-	# cd /home/debian/hidex-packages
-	# The setup_configs() function should download this
-	# dpkg -i ./linux-firmware-hidex-beaglebone-1.0.0.deb
+	#apt-get install -y locales
+	#apt-get install -y i2c-tools
+	#apt-get install -y unzip
+	#apt-get install -y zip
+
+	# Required for Hidex Control Platform:
+
+	# Note: The version may need to change at some point... and there is no meta package, wtf >_>
+	#apt-get install -y libicu63
+
+	#apt-get install -y libhidapi-libusb0
+
+	# Is this needed?
+	# apt-get install -y libhidapi-dev
 }
 
 disable_useless_services() {

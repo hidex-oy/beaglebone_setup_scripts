@@ -75,7 +75,7 @@ Then run that script as root (with sudo):
 sudo bash beaglebone_fresh_install_setup.sh
 ```
 
-After that script is finished (assuming everything went ok), you should reboot once manually, so that the custom Hidex kernel is used (not that it matters much for anything else yet, but the script deletes the old kernel including the kernel modules):
+After that script has finished (assuming everything went ok), you should reboot once manually, so that the custom Hidex kernel is used (not that it matters much for anything else yet, but the script deletes the old kernel including the kernel modules):
 ```bash
 sudo /sbin/reboot
 ```
@@ -132,3 +132,12 @@ So the command to read a disk image from the card, and compress it on the fly, w
 ```bash
 sudo dd if=/dev/mmcblk0 bs=512 count=1843200 | lzma -9 > bbb_image.img.xz
 ```
+
+
+## Using the finished disk image
+
+The finished disk image, where the "staged" setup scripts have been enabled, will automatically expand the partition on the first boot to cover the available space on the SD card. And on the second boot it will create, setup and enable a 2 GB swap file on the root partition, using the file `/swapfile`.
+
+So the only thing the user has to do, is to write that image to an empty SD card, insert the card to a BeagleBone Black, and boot it. The automated setup will take a few minutes (about 5 - 10 minutes), and once it's finished, the 4 blue user LEDs on the board will do a cycling LED bar animation. After this everything should be finished and ready for use.
+
+If WiFi network access is required, there is a short howto text document in the home directory. The installation image only contains the driver and firmware for the MediaTek MT7610 chip, which is used at least on the Asus USB-AC51 USB WiFi dongle.

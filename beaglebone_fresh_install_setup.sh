@@ -92,6 +92,7 @@ install_required_packages() {
 	echo "*** Install required packages"
 
 	apt-get install -y locales i2c-tools unzip zip libicu63 libhidapi-libusb0 libhidapi-dev
+	#apt-get install -y python3 python3-pip
 
 	#apt-get install -y locales
 	#apt-get install -y i2c-tools

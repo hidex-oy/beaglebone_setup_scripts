@@ -151,6 +151,8 @@ download_files() {
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_black_power_led_off.sh
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_black_power_led_on.sh
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/eeprom_write.sh
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/install_hidex_pkg.sh
+	#wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/make_install_pkg.sh
 
 	# cd /home/debian/hidex-packages
 	# wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/deb/linux-firmware-hidex-beaglebone-1.0.0.deb
@@ -166,6 +168,8 @@ download_files() {
 	cd /home/debian
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/wlan_howto.md
 
+	wget https://raw.githubusercontent.com/maruohon/identity/master/masa_hidex_pub.asc
+
 	mkdir -p eeprom
 	cd eeprom
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/eeprom/eeprom_hidex_ledcape_c2_4.bin
@@ -177,7 +181,7 @@ setup_configs() {
 	echo "*** Setup configs"
 
 	chmod 755 /etc/rc.local
-	chmod +x /usr/local/bin/*
+	chmod +x /usr/local/bin/*.sh
 
 	cd /home/debian
 
@@ -189,6 +193,12 @@ setup_configs() {
 
 	mkdir -p .ssh
 	chmod 700 .ssh
+
+	echo "debian ALL=(root) NOPASSWD: /usr/local/bin/install_pkg.sh" > /etc/sudoers.d/hcp_install_pkg
+	chmod 440 /etc/sudoers.d/hcp_install_pkg
+
+	# Import the keys to a separate keyring
+	gpg --keyring hidex-packages --no-default-keyring --import masa_hidex_pub.asc
 
 	disable_audio_video_overlays
 	disable_mass_storage

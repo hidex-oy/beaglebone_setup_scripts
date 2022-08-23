@@ -6,8 +6,12 @@ PACKAGE_ARCHIVE_DIR=/home/debian/packages
 INSTALL_ARCHIVE_FILE=/home/debian/dropinstall.tar.gz
 KEEP_PACKAGES=false
 
-if [ $# = 1 ]; then
+if [ $# -ge 1 ]; then
 	INSTALL_ARCHIVE_FILE=`realpath $1`
+fi
+
+if [ $# -ge 2 ] && [ "x$2" = "xremove" ]; then
+	REMOVE_PKG="true"
 fi
 
 if [ ! -f ${INSTALL_ARCHIVE_FILE} ]; then
@@ -63,3 +67,8 @@ done < "hash.txt"
 
 cd ${PWD}
 rm -r ${WORK_DIR}
+
+if [ "x${REMOVE_PKG}" = "xtrue" ]; then
+	echo "Removing the package file as requested..."
+	rm ${INSTALL_ARCHIVE_FILE}
+fi

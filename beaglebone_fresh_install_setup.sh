@@ -4,7 +4,7 @@
 # https://beagleboard.org/latest-images
 # => https://debian.beagleboard.org/images/bone-debian-10.3-console-armhf-2020-04-06-1gb.img.xz
 
-KERNEL_VERSION=4.19.94-ti-r73-hidex.10
+KERNEL_VERSION=4.19.94-ti-r73-hidex.11
 KERNEL_IMG_FILENAME="linux-image-hidex-${KERNEL_VERSION}_armhf.deb"
 LIBC_NAME="linux-libc-dev_4.19.94hidex2+-19_armhf.deb"
 
@@ -91,7 +91,7 @@ download_and_install_hidex_kernel() {
 install_required_packages() {
 	echo "*** Install required packages"
 
-	apt-get install -y locales i2c-tools unzip zip libicu63 libhidapi-libusb0 libhidapi-dev
+	apt-get install -y locales i2c-tools unzip zip libicu63 libhidapi-libusb0 libhidapi-hidraw0 libhidapi-dev
 	#apt-get install -y python3 python3-pip
 
 	#apt-get install -y locales
@@ -104,10 +104,11 @@ install_required_packages() {
 	# Note: The version may need to change at some point... and there is no meta package, wtf >_>
 	#apt-get install -y libicu63
 
+	#apt-get install -y libhidapi-hidraw0
 	#apt-get install -y libhidapi-libusb0
 
 	# Is this needed?
-	# apt-get install -y libhidapi-dev
+	#apt-get install -y libhidapi-dev
 }
 
 disable_useless_services() {

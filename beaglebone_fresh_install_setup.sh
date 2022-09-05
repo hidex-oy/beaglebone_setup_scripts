@@ -199,7 +199,12 @@ setup_configs() {
 	echo "debian ALL=(root) NOPASSWD: /usr/local/bin/install_pkg.sh" > /etc/sudoers.d/hcp_install_pkg
 	chmod 440 /etc/sudoers.d/hcp_install_pkg
 
-	# Import the keys to a separate keyring
+	# Allow normal user access to low level Hidex USB devices
+	echo "SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"2bb2\", MODE=\"0660\", GROUP=\"uucp\", TAG+=\"uaccess\"" > /etc/udev/rules.d/00-usb.rules
+
+	# Import the Hidex employee GPG keys to a separate keyring.
+	# These will be used in the install_hidex_pkg.sh script for verifying that only
+	# Hidex employee signed packages can be installed via the web interface.
 	gpg --keyring hidex-packages --no-default-keyring --import masa_hidex_pub.asc
 
 	disable_audio_video_overlays

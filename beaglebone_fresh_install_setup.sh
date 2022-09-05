@@ -4,7 +4,7 @@
 # https://beagleboard.org/latest-images
 # => https://debian.beagleboard.org/images/bone-debian-10.3-console-armhf-2020-04-06-1gb.img.xz
 
-KERNEL_VERSION=4.19.94-ti-r73-hidex.11
+KERNEL_VERSION=4.19.94-ti-r73-hidex.12
 KERNEL_IMG_FILENAME="linux-image-hidex-${KERNEL_VERSION}_armhf.deb"
 LIBC_NAME="linux-libc-dev_4.19.94hidex2+-19_armhf.deb"
 
@@ -154,6 +154,7 @@ download_files() {
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/eeprom_write.sh
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/install_hidex_pkg.sh
 	#wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/make_install_pkg.sh
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/shd.sh
 
 	# cd /home/debian/hidex-packages
 	# wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/deb/linux-firmware-hidex-beaglebone-1.0.0.deb

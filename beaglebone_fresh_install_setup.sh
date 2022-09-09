@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
 # The starting point is the Console image for BeagleBone Black:
 # https://beagleboard.org/latest-images
 # => https://debian.beagleboard.org/images/bone-debian-10.3-console-armhf-2020-04-06-1gb.img.xz
 
 KERNEL_VERSION=4.19.94-ti-r73-hidex.12
-KERNEL_IMG_FILENAME="linux-image-hidex-${KERNEL_VERSION}_armhf.deb"
+KERNEL_IMG_FILENAME="linux-image-hidex-${KERNEL_VERSION}-2_armhf.deb"
 LIBC_NAME="linux-libc-dev_4.19.94hidex2+-19_armhf.deb"
 
 uncomment_line() {
@@ -35,29 +35,52 @@ comment_line() {
 }
 
 disable_mass_storage() {
+	echo ""
+	echo "********************************************"
+	echo "***    disable_mass_storage()            ***"
+	echo "********************************************"
 	uncomment_line "/etc/default/bb-boot" "USB_IMAGE_FILE_DISABLED=yes"
 }
 
 disable_audio_video_overlays() {
+	echo ""
+	echo "********************************************"
+	echo "***    disable_audio_video_overlays()    ***"
+	echo "********************************************"
 	uncomment_line "/boot/uEnv.txt" "disable_uboot_overlay_audio=1"
 	uncomment_line "/boot/uEnv.txt" "disable_uboot_overlay_video=1"
 }
 
 enable_rtc_overlay() {
+	echo ""
+	echo "********************************************"
+	echo "***    enable_rtc_overlay()              ***"
+	echo "********************************************"
 	uncomment_line "/boot/uEnv.txt" "uboot_overlay_addr4=/lib/firmware/BB-I2C2-RTC-DS1307.dtbo"
 }
 
 enable_pru_overlay() {
+	echo ""
+	echo "********************************************"
+	echo "***    enable_pru_overlay()              ***"
+	echo "********************************************"
 	comment_line "/boot/uEnv.txt" "uboot_overlay_pru=/lib/firmware/AM335X-PRU-RPROC-4-19-TI-00A0.dtbo"
 	uncomment_line "/boot/uEnv.txt" "uboot_overlay_pru=/lib/firmware/AM335X-PRU-UIO-00A0.dtbo"
 }
 
 disable_dnsmasq_logging() {
+	echo ""
+	echo "********************************************"
+	echo "***    disable_dnsmasq_logging()         ***"
+	echo "********************************************"
 	grep -qE "^log-facility=/dev/null" /etc/dnsmasq.conf || echo "log-facility=/dev/null" >> /etc/dnsmasq.conf
 }
 
 disable_login_msgs() {
-	echo "*** Disable login messages"
+	echo ""
+	echo "********************************************"
+	echo "***    disable_login_msgs()              ***"
+	echo "********************************************"
 
 	# Disable the unnecessary login infos and MOTDs
 	comment_line "/etc/ssh/sshd_config" "Banner /etc/issue.net"
@@ -68,7 +91,10 @@ disable_login_msgs() {
 }
 
 download_and_install_hidex_kernel() {
-	echo "*** Download and install Hidex kernel"
+	echo ""
+	echo "********************************************"
+	echo "*** download_and_install_hidex_kernel()  ***"
+	echo "********************************************"
 
 	cd /home/debian
 	mkdir -p hidex_packages
@@ -82,14 +108,29 @@ download_and_install_hidex_kernel() {
 
 	cd /home/debian
 
-	# Update the boot loader file to point to the new kernel
-	sed -i "\|^uname_r=|s|^uname_r=.*\?$|uname_r=${KERNEL_VERSION}+|" /boot/uEnv.txt
+	# Update the boot loader file to point to the new kernel.
+	# The kernel package for 4.19.94-ti-r73-hidex.12-2 or later should do this automatically.
+	#sed -i "\|^uname_r=|s|^uname_r=.*\?$|uname_r=${KERNEL_VERSION}+|" /boot/uEnv.txt
 
 	apt-get remove -y linux-image-4.19.94-ti-r42
 }
 
 install_required_packages() {
-	echo "*** Install required packages"
+	echo ""
+	echo "********************************************"
+	echo "***     install_required_packages()      ***"
+	echo "********************************************"
+
+	cd /home/debian/hidex_packages
+
+	dpkg -i ./hidex-beaglebone-configs-1.0.0_armhf.deb
+
+	locale-gen
+	update-locale
+
+	dpkg -i ./hidex-beaglebone-scripts-1.0.0_armhf.deb
+	dpkg -i ./hidex-beaglebone-cape-eeprom-1.0.0-beta.1_armhf.deb
+	dpkg -i ./hidex-beaglebone-dtbo-1.0.0-beta.1_armhf.deb
 
 	apt-get install -y locales i2c-tools unzip zip libicu63 libhidapi-libusb0 libhidapi-hidraw0 libhidapi-dev
 	#apt-get install -y python3 python3-pip
@@ -112,7 +153,10 @@ install_required_packages() {
 }
 
 disable_useless_services() {
-	echo "*** Disable useless services"
+	echo ""
+	echo "********************************************"
+	echo "***    disable_useless_services()        ***"
+	echo "********************************************"
 
 	systemctl disable bluetooth.service
 	systemctl disable cron.service
@@ -121,69 +165,60 @@ disable_useless_services() {
 }
 
 update_package_repo() {
-	echo "*** Update package repo"
+	echo ""
+	echo "********************************************"
+	echo "***    update_package_repo()             ***"
+	echo "********************************************"
 
 	apt-get update
 }
 
 update_all_packages() {
-	echo "*** Update all packages"
+	echo ""
+	echo "********************************************"
+	echo "***    update_all_packages()             ***"
+	echo "********************************************"
 
 	apt-get upgrade -y
 }
 
 download_files() {
-	echo "*** Download files"
+	echo ""
+	echo "********************************************"
+	echo "***    download_files()                  ***"
+	echo "********************************************"
 
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/home/debian/.bashrc -O /home/debian/.bashrc.new
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/etc/rc.local -O /etc/rc.local
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/etc/locale.gen -O /etc/locale.gen
+	# Configs
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/dot_bashrc -O /home/debian/.bashrc.new
 
-	cd /usr/local/bin
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_enable_staged_boot_scripts.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_staged_setup.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_1_grow_partition.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_2_fsck_resize.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_3_create_swap.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_boot_disable_scripts.sh
+	mkdir -p /home/debian/hidex_packages/
+	cd /home/debian/hidex_packages/
 
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_black_user_leds_off.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_black_user_leds_on.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_black_power_led_off.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/beaglebone_black_power_led_on.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/eeprom_write.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/install_hidex_pkg.sh
-	#wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/make_install_pkg.sh
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/usr/local/bin/shd.sh
+	#wget https://github.com/hidex-oy/beaglebone_configs/releases/download/v1.0.0/hidex-beaglebone-configs-1.0.0_armhf.deb
+	#wget https://github.com/hidex-oy/beaglebone_scripts/releases/download/v1.0.0/hidex-beaglebone-scripts-1.0.0_armhf.deb
 
-	# cd /home/debian/hidex-packages
-	# wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/deb/linux-firmware-hidex-beaglebone-1.0.0.deb
+	#wget https://github.com/hidex-oy/beaglebone_cape_eeprom/releases/download/v1.0.0-beta.1/hidex-beaglebone-cape-eeprom-1.0.0-beta.1_armhf.deb
+	#wget https://github.com/hidex-oy/beaglebone_dtbo/releases/download/v1.0.0-beta.1/hidex-beaglebone-dtbo-1.0.0-beta.1_armhf.deb
 
+	# WLAN USB dongle firmware
 	mkdir -p /lib/firmware/mediatek
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/lib/firmware/mediatek/mt7610u.bin -O /lib/firmware/mediatek/mt7610u.bin
+	cd /lib/firmware/mediatek
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/lib/firmware/mediatek/mt7610u.bin
 	# The official repo for some reason gives a 0 byte file when this script is run. But manually fetching it with wget later on works... /shrug
 	#wget https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mediatek/mt7610u.bin -O /lib/firmware/mediatek/mt7610u.bin
-
-	cd /lib/firmware
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/dtbo/HIDEX-LEDCAPE-C2-00C2.dtbo
 
 	cd /home/debian
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/wlan_howto.md
 
-	wget https://raw.githubusercontent.com/maruohon/identity/master/masa_hidex_pub.asc
-
-	mkdir -p eeprom
-	cd eeprom
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/eeprom/eeprom_hidex_ledcape_c2_4.bin
-
-	cd /home/debian
+	# GPG keys to verify packages to be installed via the install_hidex_pkg.sh script
+	wget https://raw.githubusercontent.com/maruohon/identity/master/masa_hidex_pub.asc -O /tmp/masa_hidex_pub.asc
 }
 
 setup_configs() {
-	echo "*** Setup configs"
-
-	chmod 755 /etc/rc.local
-	chmod +x /usr/local/bin/*.sh
+	echo ""
+	echo "********************************************"
+	echo "***    setup_configs()                   ***"
+	echo "********************************************"
 
 	cd /home/debian
 
@@ -191,21 +226,16 @@ setup_configs() {
 		mv .bashrc .bashrc.orig
 		mv .bashrc.new .bashrc
 		chown debian:debian .bashrc
+		cp .bashrc /root/
 	fi
 
 	mkdir -p .ssh
 	chmod 700 .ssh
 
-	echo "debian ALL=(root) NOPASSWD: /usr/local/bin/install_pkg.sh" > /etc/sudoers.d/hcp_install_pkg
-	chmod 440 /etc/sudoers.d/hcp_install_pkg
-
-	# Allow normal user access to low level Hidex USB devices
-	echo "SUBSYSTEM==\"usb\", ATTRS{idVendor}==\"2bb2\", MODE=\"0660\", GROUP=\"uucp\", TAG+=\"uaccess\"" > /etc/udev/rules.d/00-usb.rules
-
 	# Import the Hidex employee GPG keys to a separate keyring.
 	# These will be used in the install_hidex_pkg.sh script for verifying that only
 	# Hidex employee signed packages can be installed via the web interface.
-	gpg --keyring hidex-packages --no-default-keyring --import masa_hidex_pub.asc
+	gpg --keyring hidex-packages --no-default-keyring --import /tmp/masa_hidex_pub.asc
 
 	disable_audio_video_overlays
 	disable_mass_storage
@@ -215,6 +245,9 @@ setup_configs() {
 	disable_dnsmasq_logging
 	disable_login_msgs
 }
+
+# Note: install_required_packages() needs to happen before setup_configs() to install
+# the required scripts and config files in place.
 
 download_files
 update_package_repo

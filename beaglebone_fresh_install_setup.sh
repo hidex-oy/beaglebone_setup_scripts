@@ -132,13 +132,17 @@ install_required_packages() {
 	dpkg -i ./hidex-beaglebone-cape-eeprom-1.0.0-beta.1_armhf.deb
 	dpkg -i ./hidex-beaglebone-dtbo-1.0.0-beta.1_armhf.deb
 
-	apt-get install -y locales i2c-tools unzip zip libicu63 libhidapi-libusb0 libhidapi-hidraw0 libhidapi-dev
+	apt-get install -y locales i2c-tools socat unzip zip libicu63 libhidapi-libusb0 libhidapi-hidraw0 libhidapi-dev
 	#apt-get install -y python3 python3-pip
 
-	#apt-get install -y locales
 	#apt-get install -y i2c-tools
+	#apt-get install -y locales
+	#apt-get install -y net-tools	# the base installation already has net-tools
 	#apt-get install -y unzip
 	#apt-get install -y zip
+
+	# socat is a dependency of hidex-detector-forwarding
+	#apt-get install -y socat
 
 	# Required for Hidex Control Platform:
 
@@ -199,6 +203,8 @@ download_files() {
 
 	#wget https://github.com/hidex-oy/beaglebone_cape_eeprom/releases/download/v1.0.0-beta.1/hidex-beaglebone-cape-eeprom-1.0.0-beta.1_armhf.deb
 	#wget https://github.com/hidex-oy/beaglebone_dtbo/releases/download/v1.0.0-beta.1/hidex-beaglebone-dtbo-1.0.0-beta.1_armhf.deb
+
+	#wget http://192.168.100.55:8080/repository/download/HidexDetectorForwarding_Release/2925:id/hidex-detector-forwarding_1.0.1.deb
 
 	# WLAN USB dongle firmware
 	mkdir -p /lib/firmware/mediatek

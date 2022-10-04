@@ -132,8 +132,16 @@ install_required_packages() {
 	dpkg -i ./hidex-beaglebone-cape-eeprom-1.0.0-beta.1_armhf.deb
 	dpkg -i ./hidex-beaglebone-dtbo-1.0.0-beta.1_armhf.deb
 
-	apt-get install -y locales i2c-tools socat unzip zip libicu63 libhidapi-libusb0 libhidapi-hidraw0 libhidapi-dev
+	apt-get install -y locales i2c-tools socat unzip zip libicu63 libusb-1.0-0 libhidapi-libusb0 libhidapi-hidraw0 libhidapi-dev
 	#apt-get install -y python3 python3-pip
+
+	#apt-get install -y libusb-1.0-0
+
+	# LibUsbDotNet 2.x is searching for libusb-1.0.so instead of libusb-1.0.so.0
+	# libusb-dev would create the /lib/arm-linux-gnueabihf/libusb-1.0.so symlink (that points to libusb-1.0.so.0.1.0)
+	# But libusb-dev would pull a few extra packages as dependencies, so let's instead just create the symlink manually
+	# in the setup_configs() method.
+	#apt-get install -y libusb-dev
 
 	#apt-get install -y i2c-tools
 	#apt-get install -y locales
@@ -237,6 +245,12 @@ setup_configs() {
 
 	mkdir -p .ssh
 	chmod 700 .ssh
+
+	# Create the symlink so that LibUsbDotNet 2.2.29 finds libusb-1.0
+	# This symlink would be created by the libusb-dev package, but it has
+	# a bunch of extra dependencies, so no point installing it just for this.
+	ln -s libusb-1.0.so.0 /lib/arm-linux-gnueabihf/libusb-1.0.so
+	ldconfig # update the cache
 
 	# Import the Hidex employee GPG keys to a separate keyring.
 	# These will be used in the install_hidex_pkg.sh script for verifying that only

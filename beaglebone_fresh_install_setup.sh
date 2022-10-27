@@ -226,6 +226,7 @@ download_files() {
 
 	# GPG keys to verify packages to be installed via the install_hidex_pkg.sh script
 	wget https://raw.githubusercontent.com/maruohon/identity/master/masa_hidex_pub.asc -O /tmp/masa_hidex_pub.asc
+	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/buildserver_pub.asc -O /tmp/buildserver_pub.asc
 }
 
 setup_configs() {
@@ -256,6 +257,7 @@ setup_configs() {
 	# These will be used in the install_hidex_pkg.sh script for verifying that only
 	# Hidex employee signed packages can be installed via the web interface.
 	gpg --keyring hidex-packages --no-default-keyring --import /tmp/masa_hidex_pub.asc
+	gpg --keyring hidex-packages --no-default-keyring --import /tmp/buildserver_pub.asc
 
 	disable_audio_video_overlays
 	disable_mass_storage

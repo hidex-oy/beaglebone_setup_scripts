@@ -123,16 +123,16 @@ install_required_packages() {
 
 	cd /home/debian/hidex_packages
 
-	dpkg -i ./hidex-beaglebone-configs-1.0.0_armhf.deb
+	dpkg -i ./hidex-beaglebone-configs-1.1.0_armhf.deb
 
 	locale-gen
 	update-locale
 
-	dpkg -i ./hidex-beaglebone-scripts-1.0.0_armhf.deb
+	dpkg -i ./hidex-beaglebone-scripts-1.2.1_armhf.deb
 	dpkg -i ./hidex-beaglebone-cape-eeprom-1.0.0-beta.1_armhf.deb
 	dpkg -i ./hidex-beaglebone-dtbo-1.0.0-beta.1_armhf.deb
 
-	apt-get install -y locales i2c-tools socat unzip zip libicu63 libusb-1.0-0 libhidapi-libusb0 libhidapi-hidraw0 libhidapi-dev
+	apt-get install -y locales i2c-tools python3 socat unzip zip libicu63 libusb-1.0-0 libhidapi-libusb0 libhidapi-hidraw0 libhidapi-dev
 	#apt-get install -y python3 python3-pip
 
 	#apt-get install -y libusb-1.0-0
@@ -206,9 +206,10 @@ download_files() {
 	mkdir -p /home/debian/hidex_packages/
 	cd /home/debian/hidex_packages/
 
-	#wget https://github.com/hidex-oy/beaglebone_configs/releases/download/v1.0.0/hidex-beaglebone-configs-1.0.0_armhf.deb
-	#wget https://github.com/hidex-oy/beaglebone_scripts/releases/download/v1.0.0/hidex-beaglebone-scripts-1.0.0_armhf.deb
-
+	# These repositories are private, so we can't actually download them here.
+	# So these are just for reference that they need to be copied in manually.
+	#wget https://github.com/hidex-oy/beaglebone_configs/releases/download/v1.1.0/hidex-beaglebone-configs-1.1.0_armhf.deb
+	#wget https://github.com/hidex-oy/beaglebone_scripts/releases/download/v1.2.1/hidex-beaglebone-scripts-1.2.1_armhf.deb
 	#wget https://github.com/hidex-oy/beaglebone_cape_eeprom/releases/download/v1.0.0-beta.1/hidex-beaglebone-cape-eeprom-1.0.0-beta.1_armhf.deb
 	#wget https://github.com/hidex-oy/beaglebone_dtbo/releases/download/v1.0.0-beta.1/hidex-beaglebone-dtbo-1.0.0-beta.1_armhf.deb
 
@@ -223,10 +224,6 @@ download_files() {
 
 	cd /home/debian
 	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/wlan_howto.md
-
-	# GPG keys to verify packages to be installed via the install_hidex_pkg.sh script
-	wget https://raw.githubusercontent.com/maruohon/identity/master/masa_hidex_pub.asc -O /tmp/masa_hidex_pub.asc
-	wget https://raw.githubusercontent.com/hidex-oy/beaglebone_setup_scripts/master/buildserver_pub.asc -O /tmp/buildserver_pub.asc
 }
 
 setup_configs() {
@@ -251,13 +248,15 @@ setup_configs() {
 	# This symlink would be created by the libusb-dev package, but it has
 	# a bunch of extra dependencies, so no point installing it just for this.
 	ln -s libusb-1.0.so.0 /lib/arm-linux-gnueabihf/libusb-1.0.so
-	ldconfig # update the cache
+	# update the cache
+	ldconfig
 
 	# Import the Hidex employee GPG keys to a separate keyring.
 	# These will be used in the install_hidex_pkg.sh script for verifying that only
 	# Hidex employee signed packages can be installed via the web interface.
-	gpg --keyring hidex-packages --no-default-keyring --import /tmp/masa_hidex_pub.asc
-	gpg --keyring hidex-packages --no-default-keyring --import /tmp/buildserver_pub.asc
+	# These are now imported by the hidex-beaglebone-scripts package starting in version 1.2.1
+	#gpg --keyring hidex-packages --no-default-keyring --import /tmp/masa_hidex_pub.asc
+	#gpg --keyring hidex-packages --no-default-keyring --import /tmp/buildserver_pub.asc
 
 	disable_audio_video_overlays
 	disable_mass_storage
